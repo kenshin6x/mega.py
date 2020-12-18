@@ -2,7 +2,6 @@ import math
 import re
 import json
 import logging
-import secrets
 from pathlib import Path
 import hashlib
 from Crypto.Cipher import AES
@@ -617,7 +616,7 @@ class Mega:
             master_key_cipher.encrypt(node_data['h'].encode("utf8") +
                                       node_data['h'].encode("utf8")))
 
-        share_key = secrets.token_bytes(16)
+        share_key = "\x00"+os.urandom(16)+"\x00"
         ok = base64_url_encode(master_key_cipher.encrypt(share_key))
 
         share_key_cipher = AES.new(share_key, AES.MODE_ECB)
