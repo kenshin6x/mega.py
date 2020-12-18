@@ -162,7 +162,7 @@ class Mega:
         if not isinstance(data, list):
             data = [data]
 
-        url = f'{self.schema}://g.api.{self.domain}/cs'
+        url = "%s://g.api.{self.domain}/cs" % self.schema
         response = requests.post(
             url,
             params=params,
@@ -196,7 +196,8 @@ class Mega:
             file_id = re.findall(r'\W\w\w\w\w\w\w\w\w\W', url)[0][1:-1]
             id_index = re.search(file_id, url).end()
             key = url[id_index + 1:]
-            return f'{file_id}!{key}'
+            
+            return "%s!%s" %(file_id, key)
         elif '!' in url:
             # V1 URL structure
             match = re.findall(r'/#!(.*)', url)
@@ -369,8 +370,13 @@ class Mega:
             file_key = file['k'][file['k'].index(':') + 1:]
             decrypted_key = a32_to_base64(
                 decrypt_key(base64_to_a32(file_key), self.master_key))
-            return (f'{self.schema}://{self.domain}'
-                    f'/#!{public_handle}!{decrypted_key}')
+            
+            link = "%s://%s/#!%s!%s" % (self.schema, 
+                                        self.domain, 
+                                        public_handle, 
+                                        decrypted_key)
+
+            return link
         else:
             raise ValueError('''Upload() response required as input,
                             use get_link() for regular file input''')
@@ -386,8 +392,14 @@ class Mega:
                 raise RequestError("Can't get a public link from that file "
                                    "(is this a shared file?)")
             decrypted_key = a32_to_base64(file['key'])
-            return (f'{self.schema}://{self.domain}'
-                    f'/#!{public_handle}!{decrypted_key}')
+            
+            
+            link = "%s://%s/#!%s!%s" % (self.schema, 
+                                        self.domain, 
+                                        public_handle, 
+                                        decrypted_key)
+            
+            return link
         else:
             raise ValidationError('File id and key must be present')
 
@@ -408,8 +420,13 @@ class Mega:
                 raise RequestError("Can't get a public link from that file "
                                    "(is this a shared file?)")
             decrypted_key = a32_to_base64(file['shared_folder_key'])
-            return (f'{self.schema}://{self.domain}'
-                    f'/#F!{public_handle}!{decrypted_key}')
+
+            link = "%s://%s/#F!%s!%s" % (self.schema, 
+                                        self.domain, 
+                                        public_handle, 
+                                        decrypted_key)
+
+            return link
         else:
             raise ValidationError('File id and key must be present')
 
